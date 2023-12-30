@@ -11,11 +11,15 @@
     <ItemGroup>
       <None Remove="Assets\backgroun.png" />
       <Content Include="Assets\background.png">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <None Remove="Assets\tg.png" />
       <Content Include="Assets\tg.png">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Assets\currentSettings.json" />
+      <Content Include="Assets\currentSettings.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
 
@@ -30,5 +34,5 @@
     <ItemGroup>
       <Folder Include="Binary\" />
     </ItemGroup>
-
-</Project>
+  
+  </Project>
