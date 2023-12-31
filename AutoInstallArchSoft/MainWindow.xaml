@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AutoInstallArchSoft"
+        xmlns:cnvrt="clr-namespace:AutoInstallArchSoft.Converters"
         xmlns:vm="clr-namespace:AutoInstallArchSoft.ViewModels"
         mc:Ignorable="d"
         BorderThickness="1"
@@ -16,6 +17,11 @@
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
+    
+    <Window.Resources>
+        <cnvrt:KeyStatusToCollor x:Key="keyStatusToCollor" />
+        <cnvrt:KeyStatusToString x:Key="keyStatusToString" />
+    </Window.Resources>
     
     <Grid>
             <Grid.RowDefinitions>
@@ -143,6 +149,7 @@
                     <RowDefinition Height="30"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
+                
                 <Button Command="{Binding GoToMainPageCommand}" HorizontalAlignment="Left" Width="80" Margin="10,0,0,0">
                     <Button.Resources>
                         <Style TargetType="Border">
@@ -169,8 +176,29 @@
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="22"/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    
+                    <Label Grid.Row="0" Content="Ключ:" FontSize="15" Width="40" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="0" Margin="0,10,220,0"/>
+                    <TextBox Grid.Row="0" Text="{Binding Key, UpdateSourceTrigger=PropertyChanged}" Width="215" Height="25" HorizontalAlignment="Center" Margin="50,10,0,0" Padding="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                    <Label Grid.Row="1" Content="{Binding KeyStatus, Converter={StaticResource keyStatusToString}}" Foreground="{Binding KeyStatus, Converter={StaticResource keyStatusToCollor}}" FontSize="10" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="0" Margin="50,0,0,0" Visibility="{Binding KeyIsInput}"/>
+                    
+                </Grid>
+                
             </Grid>
             
+            
+            <TextBlock Grid.Row="3" TextWrapping="Wrap" Width="270" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,0,0">
+                <Run Text="Все вопросы по поводу"/>
+                <Run Text="преобретения ключа" FontStyle="Oblique" FontWeight="Bold"/>
+                <Run Text="или возникших трудностях во время установки"/>
+                <Run Text="в Telegram."></Run>
+            </TextBlock>
             
             <Button Command="{Binding GoToTelegramCommand}" Grid.Row="3" Height="60" Width="60" HorizontalAlignment="Right" Margin="0,0,30,0" Padding="0" BorderThickness="0" Background="Black">
                 <Button.Resources>
