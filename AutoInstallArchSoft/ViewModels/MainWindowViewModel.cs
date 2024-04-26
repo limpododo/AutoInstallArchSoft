@@ -1,147 +1,80 @@
 using System.Diagnostics;
 using System.Windows;
-using System.Windows.Input;
-using AutoInstallArchSoft.Enums;
+using DevExpress.Mvvm;
+using DevExpress.Mvvm.DataAnnotations;
 using AutoInstallArchSoft.Models;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 
 namespace AutoInstallArchSoft.ViewModels;
 
-public class MainWindowViewModel : ObservableRecipient
+public class MainWindowViewModel : ViewModelBase
 {
-    private Visibility _mainPageIsVisible;
-    private Visibility _settingPageIsVisible;
+    private static readonly string TELEGRAMBOTLINK = Application.Current.Resources["TgBotLink"].ToString();
     
-    private Visibility _keyIsInput;
-    private string _key = String.Empty;
-    private string _oneFolderPath = String.Empty;
-    private KeyStatus _keyStatus;
-
-    private Visibility _oneFolderIsVisible;
-    private Visibility _manyFoldersIsVisible;
-    private bool _isOneFolderLocation;
-
     private AutoInstallAlgorithm _installAlgorithm;
+    private AutoCrackAlgorithm _crackAlgorithm;
 
     public MainWindowViewModel()
-    {
+    {   
         _installAlgorithm = new AutoInstallAlgorithm();
-        _installAlgorithm.PathToArchiveFolder = "/Binary";
+        _crackAlgorithm = new AutoCrackAlgorithm();
         
-        SelectPage(1);
-        IsOneFolderLocation = true;
-        KeyIsInput = Visibility.Hidden;
-
-        GoToSettingPageCommand = new RelayCommand(GoToSettingPage);
-        GoToMainPageCommand = new RelayCommand(GoToMainPage);
-        GoToTelegramCommand = new RelayCommand(GoToTelegram);
-    }
-    public Visibility MainPageIsVisible
-    {
-        get => _mainPageIsVisible;
-        set => SetProperty(ref _mainPageIsVisible, value);
-    }
-    public Visibility SettingPageIsVisible
-    {
-        get => _settingPageIsVisible;
-        set => SetProperty(ref _settingPageIsVisible, value);
-    }
-    
-    public Visibility KeyIsInput
-    {
-        get => _keyIsInput;
-        set => SetProperty(ref _keyIsInput, value);
+        MainPanelViewModel = new MainPanelViewModel(_installAlgorithm, _crackAlgorithm);
+        InstallSettingsViewModel = new InstallSettingsViewModel(_installAlgorithm, _crackAlgorithm);
+        
+        MainPanelViewModel.IsVisible = Visibility.Visible;
+        InstallSettingsViewModel.IsVisible = Visibility.Collapsed;
+        
+        InstallSettingsButtonText = Application.Current.Resources["InstallSettingsButtonText1"].ToString();
     }
 
-    public KeyStatus KeyStatus
+    public MainPanelViewModel MainPanelViewModel
     {
-        get => _keyStatus;
-        set => SetProperty(ref _keyStatus, value);
+        get => GetProperty(() => MainPanelViewModel);
+        set => SetProperty(() => MainPanelViewModel, value);
     }
-    public string Key
+    public InstallSettingsViewModel InstallSettingsViewModel 
     {
-        get => _key;
-        set
-        {
-            KeyIsInput = value.Length > 0 ? Visibility.Visible : Visibility.Hidden;
-            KeyStatus = value.Equals("123-456-789") ? KeyStatus.True : KeyStatus.False;
-                
-            SetProperty(ref _key, value);
-        }
+        get => GetProperty(() => InstallSettingsViewModel);
+        set => SetProperty(() => InstallSettingsViewModel, value);
     }
+    
+    #region OpenInstallSettingCommand
 
-    public bool IsOneFolderLocation
+    [Command]
+    public void OpenInstallSetting()
     {
-        get => _isOneFolderLocation;
-        set
+        if (InstallSettingsViewModel.IsVisible != Visibility.Visible)
         {
-            SelectInstallLocation(value ? 0 : 1);
-            
-            SetProperty(ref _isOneFolderLocation, value);
-        }
-    }  
-    public string OneFolderPath
-    {
-        get => _oneFolderPath;
-        set
-        {
-            _installAlgorithm.PathsToTargetFolders.Add(value);
-            SetProperty(ref _oneFolderPath, value);
-        }
-    }
-    
-    public Visibility OneFolderIsVisible
-    {
-        get => _oneFolderIsVisible;
-        set => SetProperty(ref _oneFolderIsVisible, value);
-    }
-    
-    public Visibility ManyFoldersIsVisible
-    {
-        get => _manyFoldersIsVisible;
-        set => SetProperty(ref _manyFoldersIsVisible, value);
-    }
-    
-    public ICommand GoToSettingPageCommand { get; }
-    private void GoToSettingPage() => SelectPage(1);
-    
-    public ICommand GoToMainPageCommand { get; }
-    private void GoToMainPage() => SelectPage(0);
+            MainPanelViewModel.IsVisible = Visibility.Collapsed;
+            InstallSettingsViewModel.IsVisible = Visibility.Visible;
 
-    
-    public ICommand GoToTelegramCommand { get; }
-    private void GoToTelegram()
-    {
-        Process.Start(new ProcessStartInfo("https://t.me/ArchSoft_bot") { UseShellExecute = true });
-    }
-    private void SelectPage(int indexPage)
-    {
-        switch (indexPage)
-        {
-            case 0:
-                MainPageIsVisible = Visibility.Visible;
-                SettingPageIsVisible = Visibility.Hidden;
-                break;
-            case 1:
-                MainPageIsVisible = Visibility.Hidden;
-                SettingPageIsVisible = Visibility.Visible;
-                break;
+            InstallSettingsButtonText = Application.Current.Resources["InstallSettingsButtonText2"].ToString();
         }
-    }
+        else
+        {
+            MainPanelViewModel.IsVisible = Visibility.Visible;
+            InstallSettingsViewModel.IsVisible = Visibility.Collapsed;
 
-    private void SelectInstallLocation(int indexLocation)
-    {
-        switch (indexLocation)
-        {
-            case 0:
-                OneFolderIsVisible = Visibility.Visible;
-                ManyFoldersIsVisible = Visibility.Hidden;
-                break;
-            case 1:
-                OneFolderIsVisible = Visibility.Hidden;
-                ManyFoldersIsVisible = Visibility.Visible;
-                break;
+            InstallSettingsButtonText = Application.Current.Resources["InstallSettingsButtonText1"].ToString();
         }
     }
+    public string InstallSettingsButtonText
+    {
+        get => GetProperty(() => InstallSettingsButtonText);
+        set => SetProperty(() => InstallSettingsButtonText, value);
+    }
+    
+    public bool CanOpenInstallSetting => true;
+    #endregion
+    
+    #region GoToTelegramCommand
+    [Command]
+    public void GoToTelegram()
+    {
+        try { Process.Start(new ProcessStartInfo(TELEGRAMBOTLINK) { UseShellExecute = true });}
+        catch (Exception e) { /* ignore */ }
+    }
+    public bool CanGoToTelegram => false;
+    #endregion
+   
 }
