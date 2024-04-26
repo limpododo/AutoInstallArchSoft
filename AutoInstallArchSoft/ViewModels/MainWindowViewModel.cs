@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 using AutoInstallArchSoft.Enums;
+using AutoInstallArchSoft.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -9,16 +10,27 @@ namespace AutoInstallArchSoft.ViewModels;
 
 public class MainWindowViewModel : ObservableRecipient
 {
-    private Visibility mainPageIsVisible;
-    private Visibility settingPageIsVisible;
+    private Visibility _mainPageIsVisible;
+    private Visibility _settingPageIsVisible;
     
-    private Visibility keyIsInput;
-    private string key;
-    private KeyStatus keyStatus;
+    private Visibility _keyIsInput;
+    private string _key = String.Empty;
+    private string _oneFolderPath = String.Empty;
+    private KeyStatus _keyStatus;
+
+    private Visibility _oneFolderIsVisible;
+    private Visibility _manyFoldersIsVisible;
+    private bool _isOneFolderLocation;
+
+    private AutoInstallAlgorithm _installAlgorithm;
 
     public MainWindowViewModel()
     {
+        _installAlgorithm = new AutoInstallAlgorithm();
+        _installAlgorithm.PathToArchiveFolder = "/Binary";
+        
         SelectPage(1);
+        IsOneFolderLocation = true;
         KeyIsInput = Visibility.Hidden;
 
         GoToSettingPageCommand = new RelayCommand(GoToSettingPage);
@@ -27,36 +39,68 @@ public class MainWindowViewModel : ObservableRecipient
     }
     public Visibility MainPageIsVisible
     {
-        get => mainPageIsVisible;
-        set => SetProperty(ref mainPageIsVisible, value);
+        get => _mainPageIsVisible;
+        set => SetProperty(ref _mainPageIsVisible, value);
     }
     public Visibility SettingPageIsVisible
     {
-        get => settingPageIsVisible;
-        set => SetProperty(ref settingPageIsVisible, value);
+        get => _settingPageIsVisible;
+        set => SetProperty(ref _settingPageIsVisible, value);
     }
     
     public Visibility KeyIsInput
     {
-        get => keyIsInput;
-        set => SetProperty(ref keyIsInput, value);
+        get => _keyIsInput;
+        set => SetProperty(ref _keyIsInput, value);
     }
 
     public KeyStatus KeyStatus
     {
-        get => keyStatus;
-        set => SetProperty(ref keyStatus, value);
+        get => _keyStatus;
+        set => SetProperty(ref _keyStatus, value);
     }
     public string Key
     {
-        get => key;
+        get => _key;
         set
         {
             KeyIsInput = value.Length > 0 ? Visibility.Visible : Visibility.Hidden;
-            KeyStatus = value.Equals("123") ? KeyStatus.True : KeyStatus.False;
+            KeyStatus = value.Equals("123-456-789") ? KeyStatus.True : KeyStatus.False;
                 
-            SetProperty(ref key, value);
+            SetProperty(ref _key, value);
         }
+    }
+
+    public bool IsOneFolderLocation
+    {
+        get => _isOneFolderLocation;
+        set
+        {
+            SelectInstallLocation(value ? 0 : 1);
+            
+            SetProperty(ref _isOneFolderLocation, value);
+        }
+    }  
+    public string OneFolderPath
+    {
+        get => _oneFolderPath;
+        set
+        {
+            _installAlgorithm.PathsToTargetFolders.Add(value);
+            SetProperty(ref _oneFolderPath, value);
+        }
+    }
+    
+    public Visibility OneFolderIsVisible
+    {
+        get => _oneFolderIsVisible;
+        set => SetProperty(ref _oneFolderIsVisible, value);
+    }
+    
+    public Visibility ManyFoldersIsVisible
+    {
+        get => _manyFoldersIsVisible;
+        set => SetProperty(ref _manyFoldersIsVisible, value);
     }
     
     public ICommand GoToSettingPageCommand { get; }
@@ -82,6 +126,21 @@ public class MainWindowViewModel : ObservableRecipient
             case 1:
                 MainPageIsVisible = Visibility.Hidden;
                 SettingPageIsVisible = Visibility.Visible;
+                break;
+        }
+    }
+
+    private void SelectInstallLocation(int indexLocation)
+    {
+        switch (indexLocation)
+        {
+            case 0:
+                OneFolderIsVisible = Visibility.Visible;
+                ManyFoldersIsVisible = Visibility.Hidden;
+                break;
+            case 1:
+                OneFolderIsVisible = Visibility.Hidden;
+                ManyFoldersIsVisible = Visibility.Visible;
                 break;
         }
     }
