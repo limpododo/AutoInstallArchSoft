@@ -1,0 +1,65 @@
+﻿<Window x:Class="AutoInstallArchSoft.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:AutoInstallArchSoft.ViewModels"
+    xmlns:views="clr-namespace:AutoInstallArchSoft.Views"
+    BorderThickness="1" ResizeMode="NoResize" WindowStyle="None" WindowStartupLocation="CenterScreen"
+    Height="550" Width="400" Background="#FFFFFF">
+    
+    <Window.DataContext>
+        <vm:MainWindowViewModel/>
+    </Window.DataContext>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="150"/>
+            <RowDefinition/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="80"/>
+        </Grid.RowDefinitions>
+            
+        <!-- Control Panel -->
+        <Grid Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+            <Button Click="Close" 
+                    Style="{StaticResource CloseAppButtonStyle}"
+                    HorizontalAlignment="Right" 
+                    Height="20" Width="20" 
+                    Margin="0,0,5,0"/>
+        </Grid>
+            
+        <!-- Logo -->
+        <Grid Grid.Row="1">
+             <Image Source="../Assets/background.png" 
+                    Margin="15"/>
+        </Grid>
+            
+        <!-- Content -->
+        <Grid Grid.Row="2">
+            <views:MainPanelView DataContext="{Binding MainPanelViewModel}"
+                                 Visibility="{Binding IsVisible}"/>
+      
+            <views:InstallSettingsView DataContext="{Binding InstallSettingsViewModel}"
+                                       Visibility="{Binding IsVisible}"/>
+        </Grid>
+        
+        <Button Grid.Row="3" Command="{Binding OpenInstallSettingCommand}" Content="{Binding InstallSettingsButtonText}" 
+                Style="{DynamicResource AsDotButtonStyle}" Height="50" Width="250" VerticalAlignment="Center"/>
+        
+        <!-- Footer -->
+        <Grid Grid.Row="4">
+            <TextBlock Text="{StaticResource FooterText}" 
+                       HorizontalAlignment="Left" VerticalAlignment="Center" 
+                       TextWrapping="Wrap" Width="270" 
+                       Margin="20,0,0,0">
+               
+            </TextBlock>
+            
+            <Button Command="{Binding GoToTelegramCommand}" 
+                    Style="{StaticResource TgBotButtonStyle}" 
+                    Height="60" Width="60"
+                    HorizontalAlignment="Right" 
+                    Margin="0,0,30,0"/>
+        </Grid>
+    </Grid>  
+</Window>
