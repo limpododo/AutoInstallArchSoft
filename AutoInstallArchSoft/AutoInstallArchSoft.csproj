@@ -29,6 +29,7 @@
 
     <ItemGroup>
       <Page Update="MainWindow.xaml">
+      <Page Update="Views\MainWindow.xaml">
         <Generator>MSBuild:Compile</Generator>
         <XamlRuntime>Wpf</XamlRuntime>
         <SubType>Designer</SubType>
